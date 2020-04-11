@@ -1,6 +1,6 @@
 import sys
 
-verbose = False
+verbose = True
 
 class Edge():
     def __init__(self, u, v, weight, n):
@@ -61,36 +61,38 @@ class Graph():
         else:
             if verbose: print("Error: find set returned none on u or v")
 
-    def findMinEdge(self):
-        minWeight = self.edgeList[0].weight
-        minWeightInd = 0
-        for edge in range(len(self.edgeList)):
-            if verbose: print("Comparing " + str(self.edgeList[edge].weight) + " to " + str(minWeight) + " with current min = " + str(minWeight))
-            if self.edgeList[edge].weight < minWeight:
-                minWeight = self.edgeList[edge].weight
-                minWeightInd = edge
-                if verbose: print("New Min Set!")
-        if verbose: print("Min Weight Found =  " + str(minWeight))
-        return self.edgeList[minWeightInd]
+    #def findMinEdge(self):
+    #    minWeight = self.edgeList[0][2]
+    #    minWeightInd = 0
+    #    for edge in range(len(self.edgeList)):
+    #        if verbose: print("Comparing " + str(self.edgeList[edge][2]) + " to " + str(minWeight) + " with current min = " + str(minWeight))
+    #        if self.edgeList[edge][2] < minWeight:
+    #            minWeight = self.edgeList[edge][2]
+    #            minWeightInd = edge
+    #            if verbose: print("New Min Set!")
+    #    if verbose: print("Min Weight Found =  " + str(minWeight))
+    #    return self.edgeList[minWeightInd]
 
     def runKruskal(self):
         if verbose: print("Running Kruskal's Algorithm")
         A = []
         while len(self.edgeList) != 0:
-            currEdge = self.findMinEdge()
-            u = currEdge.u
-            v = currEdge.v
-            if verbose: print("For Vertex: (" + str(u) +"," +str(v) + "), and Comparing sets: " + str(self.findSet(u)) + " with " + str(self.findSet(v)))
-            if self.findSet(u) != self.findSet(v):
+            currEdge = self.edgeList.pop(0)
+            u = currEdge[0]
+            v = currEdge[1]
+            uSet = self.findSet(u)
+            vSet = self.findSet(v)
+            if verbose: print("For Vertex: (" + str(u) +"," +str(v) + "), and Comparing sets: " + str(uSet) + " with " + str(vSet))
+            if uSet != vSet:
                 A.append([u,v])
-                self.union(u,v)
-            del self.edgeList[self.edgeList.index(currEdge)]
+                self.union(u, v)
         return A
 
-    def genEdges(self, ogEdgeList):
-        newList = removeDups(ogEdgeList)
-        for e in range(len(newList)):
-            self.edgeList.append(Edge(newList[e][0], newList[e][1], int(newList[e][2]), e))
+    #def genEdges(self, ogEdgeList):
+    #    #newList = removeDups(ogEdgeList)
+    #    newList = ogEdgeList
+    #    for e in range(len(newList)):
+    #        self.edgeList.append(Edge(newList[e][0], newList[e][1], int(newList[e][2]), e))
 
 def importNodes(filePath):
     global verbose
@@ -113,7 +115,9 @@ def importNodes(filePath):
                 if int(nodeConnections[nc]) != 0:
                     rawEdgeList.append([nodeIndex, nc, int(nodeConnections[nc])])
         nodeIndex += 1
-    graph.genEdges(rawEdgeList)
+    rawEdgeList = sorted(rawEdgeList,key=lambda x: x[2])
+    graph.edgeList = rawEdgeList
+    #graph.genEdges(rawEdgeList)
     return graph
 
 def removeDups(tree):
@@ -134,7 +138,7 @@ def main():
     if verbose: print("Starting Program")
     if len(sys.argv) == 2:
         g = importNodes(sys.argv[1])
-        if verbose: print("Num of Edges: " + len(g.edgeList))
+        #if verbose: print("Num of Edges: " + len(g.edgeList))
         #g.printGraph()
         mst = g.runKruskal()
         if verbose: print("\nSOLUTION\n------------------------------")
