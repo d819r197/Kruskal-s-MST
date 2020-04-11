@@ -1,6 +1,6 @@
 import sys
 
-verbose = True
+verbose = False
 
 class Edge():
     def __init__(self, u, v, weight, n):
